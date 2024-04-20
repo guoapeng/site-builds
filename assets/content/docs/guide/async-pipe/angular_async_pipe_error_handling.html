@@ -1,0 +1,258 @@
+<p>处理 web 应用程序中的错误对于获得良好的用户体验非常重要。有时会发生异常，每个应用程序都应该涵盖这些情况，以帮助用户了解发生了不好的事情。</p>
+<p>许多教程没有显示如何在使用异步管道时处理错误/异常情况。因此，在这篇文章中，我们将研究如何处理这些错误案例的一些技术。</p>
+<!-- more -->
+
+<p>一个简单的异步管道示例
+让我们看看您可能在许多教程中看到的一个示例：</p>
+<pre class="language-ts"><code class="language-ts"><div>
+@<span class="token function">Component</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  selector<span class="token punctuation">:</span> <span class="token string">"app-mycomponent"</span><span class="token punctuation">,</span>
+  changeDetection<span class="token punctuation">:</span> ChangeDetectionStrategy<span class="token punctuation">.</span>OnPush<span class="token punctuation">,</span>
+  template<span class="token punctuation">:</span> <span class="token template-string"><span class="token string">`
+    &lt;div *ngIf="users$ | async as users; else loading">
+      &lt;div *ngFor="let user of users">
+        {{ user.name }}
+      &lt;/div>
+    &lt;/div>
+
+    &lt;ng-template #loading> Loading users... &lt;/ng-template>
+  `</span></span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">class</span> <span class="token class-name">MyComponent</span> <span class="token punctuation">{</span>
+  users$<span class="token punctuation">:</span> Observable<span class="token operator">&lt;</span>User<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">></span><span class="token punctuation">;</span>
+
+  <span class="token keyword">constructor</span><span class="token punctuation">(</span>httpClient<span class="token punctuation">:</span> HttpClient<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>users$ <span class="token punctuation">:</span> httpClient<span class="token punctuation">.</span><span class="token keyword">get</span><span class="token operator">&lt;</span>User<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token string">"/api/users"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</div></code></pre>
+<p>异步管道订阅$users observable。第一种状态是“加载”状态，因为 Observable 还没有发出值，所以*ngIf 中的 else 情况是 active 的。当 HTTP 请求以 2xx 状态代码响应时，一切都很好：用户将看到用户列表。</p>
+<p>这个例子只是一个 happy case, 并没有考虑 observable 出现异常的情况。当 HTTP 请求以错误结束时，用户在页面上看不到任何错误消息。他仍然会看到加载状态，这与用户在这种情况下的预期相去甚远。那么，我们如何更好地处理这一问题，并向用户表明发生了不好的事情？</p>
+
+        <h2 id="1--%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88" class="docs-header-link">
+          <span header-link="1--%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"></span>
+          1. 一个简单的解决方案
+        </h2>
+      <p>让我们从上面扩展我们的示例，以便能够处理所有三种状态（加载、成功、错误）：</p>
+<pre class="language-ts"><code class="language-ts"><div><span class="token keyword">import</span> <span class="token punctuation">{</span> ChangeDetectionStrategy<span class="token punctuation">,</span> Component <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@angular/core"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> Observable<span class="token punctuation">,</span> Subject<span class="token punctuation">,</span> of <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"rxjs"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> catchError <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"rxjs/operators"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> HttpClient<span class="token punctuation">,</span> HttpClientModule <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@angular/common/http"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> CommonModule <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@angular/common"</span><span class="token punctuation">;</span>
+
+@<span class="token function">Component</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  standalone<span class="token punctuation">:</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+  selector<span class="token punctuation">:</span> <span class="token string">"app-mycomponent"</span><span class="token punctuation">,</span>
+  changeDetection<span class="token punctuation">:</span> ChangeDetectionStrategy<span class="token punctuation">.</span>OnPush<span class="token punctuation">,</span>
+  template<span class="token punctuation">:</span> <span class="token template-string"><span class="token string">`
+    &lt;p>hi&lt;/p>
+    &lt;div *ngIf="users$ | async as users; else loadingOrError">
+      &lt;div *ngFor="let user of users">
+        {{ user.name }}
+      &lt;/div>
+    &lt;/div>
+
+    &lt;ng-template #loadingOrError>
+      &lt;div *ngIf="loadingError$ | async; else loading">
+        Error loading the list of users. Please try again later.
+      &lt;/div>
+      &lt;ng-template #loading>Loading users...&lt;/ng-template>
+    &lt;/ng-template>
+  `</span></span><span class="token punctuation">,</span>
+  imports<span class="token punctuation">:</span> <span class="token punctuation">[</span>CommonModule<span class="token punctuation">,</span> HttpClientModule<span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">MyComponent</span> <span class="token punctuation">{</span>
+  users$<span class="token punctuation">:</span> Observable<span class="token operator">&lt;</span>User<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">></span><span class="token punctuation">;</span>
+  loadingError$<span class="token punctuation">:</span> Subject<span class="token operator">&lt;</span><span class="token keyword">boolean</span><span class="token operator">></span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Subject</span><span class="token operator">&lt;</span><span class="token keyword">boolean</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">constructor</span><span class="token punctuation">(</span>httpClient<span class="token punctuation">:</span> HttpClient<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>users$ <span class="token operator">=</span> httpClient<span class="token punctuation">.</span><span class="token keyword">get</span><span class="token operator">&lt;</span>User<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token string">"/api/users"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">pipe</span><span class="token punctuation">(</span>
+      <span class="token function">catchError</span><span class="token punctuation">(</span><span class="token punctuation">(</span>error<span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// it's important that we log an error here.</span>
+        <span class="token comment" spellcheck="true">// Otherwise you won't see an error in the console.</span>
+        console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">"error loading the list of users"</span><span class="token punctuation">,</span> error<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>loadingError$<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token keyword">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token function">of</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">export</span> <span class="token keyword">interface</span> <span class="token class-name">User</span> <span class="token punctuation">{</span>
+  name<span class="token punctuation">:</span> <span class="token keyword">string</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></div></code></pre>
+<p>当创建组件时，我们会为 users$ observable 创建一个处理错误状态的 ng template #loadingOrError 和一个接受信息的 observableerrorLoading$。</p>
+<p>如果发生错误，我们将使用 catchError 运算符捕获错误。catchError 的作用是，您将不再在 devtools 控制台中看到错误，这对调试错误情况没有太大用处。接下来，我们为 loadingError$主题发出一个新值。最后一个重要步骤是用 of 算子恢复可观测值，并给它一个 false 值。您也可以使用 null。</p>
+
+        <h2 id="2--%E5%88%86%E7%A6%BB%E5%BC%82%E5%B8%B8%E6%95%B0%E6%8D%AE" class="docs-header-link">
+          <span header-link="2--%E5%88%86%E7%A6%BB%E5%BC%82%E5%B8%B8%E6%95%B0%E6%8D%AE"></span>
+          2. 分离异常数据
+        </h2>
+      <p>上面显示的解决方案基本能解决问题，但是还有很大的改善空间。所以，让我们看看如何做得更好一点。</p>
+<p>记住我们的目标，我们的目标是将加载过程显示和错误处理抽取到一个独立的组件中，提高代码的可重用性，并且尽量减少对现有 async pipe 结构的侵入性。</p>
+<p>回顾以上解决方案，我们发现有两个问题，首先第一点，正常数据流与异常数据流，紧密耦合在一起，这不利于我们朝目标方向进行重构。</p>
+<p>第二点，我们完全创建了一个全新的 loadingError$ subject,这个有点多余，而且它只接受 boolean 对象，这不利于我们向用户展示详细错误信息， 我们可以在 users$ observable 的基础上分岔出一个加载异常流。</p>
+<p>下面我们就以上两点进行改进。</p>
+<pre class="language-ts"><code class="language-ts"><div><span class="token keyword">import</span> <span class="token punctuation">{</span> CommonModule <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@angular/common"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> HttpClient<span class="token punctuation">,</span> HttpClientModule <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@angular/common/http"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> ChangeDetectionStrategy<span class="token punctuation">,</span> Component <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@angular/core"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> Observable<span class="token punctuation">,</span> of <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"rxjs"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> catchError<span class="token punctuation">,</span> ignoreElements<span class="token punctuation">,</span> shareReplay <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"rxjs/operators"</span><span class="token punctuation">;</span>
+
+@<span class="token function">Component</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  standalone<span class="token punctuation">:</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+  selector<span class="token punctuation">:</span> <span class="token string">"app-mycomponent"</span><span class="token punctuation">,</span>
+  changeDetection<span class="token punctuation">:</span> ChangeDetectionStrategy<span class="token punctuation">.</span>OnPush<span class="token punctuation">,</span>
+  template<span class="token punctuation">:</span> <span class="token template-string"><span class="token string">`
+    &lt;div *ngIf="users$ | async as users; else loadingOrError">
+      &lt;div *ngFor="let user of users">
+        {{ user.name }}
+      &lt;/div>
+    &lt;/div>
+
+    &lt;ng-template #loadingOrError>
+      &lt;div *ngIf="loadingError$ | async as originalErrorMsg; else loading">
+        &lt;p>Error loading the list of users.&lt;/p>
+        &lt;p>{{ originalErrorMsg }}&lt;/p>
+        &lt;p>Please try again later.&lt;/p>
+      &lt;/div>
+      &lt;ng-template #loading>Loading users...&lt;/ng-template>
+    &lt;/ng-template>
+  `</span></span><span class="token punctuation">,</span>
+  imports<span class="token punctuation">:</span> <span class="token punctuation">[</span>CommonModule<span class="token punctuation">,</span> HttpClientModule<span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">MyComponent</span> <span class="token punctuation">{</span>
+  users$<span class="token punctuation">:</span> Observable<span class="token operator">&lt;</span>User<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">></span><span class="token punctuation">;</span>
+  loadingError$<span class="token punctuation">:</span> Observable<span class="token operator">&lt;</span><span class="token keyword">string</span><span class="token operator">></span><span class="token punctuation">;</span>
+
+  <span class="token keyword">constructor</span><span class="token punctuation">(</span>httpClient<span class="token punctuation">:</span> HttpClient<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>users$ <span class="token operator">=</span> httpClient<span class="token punctuation">.</span><span class="token keyword">get</span><span class="token operator">&lt;</span>User<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token string">"/api/users"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>loadingError$ <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>users$<span class="token punctuation">.</span><span class="token function">pipe</span><span class="token punctuation">(</span>
+      <span class="token function">shareReplay</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">ignoreElements</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment" spellcheck="true">// 忽略数据元素，避免数据元素对异常数据流的影响</span>
+      <span class="token function">catchError</span><span class="token punctuation">(</span><span class="token punctuation">(</span>error<span class="token punctuation">:</span> <span class="token keyword">any</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// it's important that we log an error here.</span>
+        <span class="token comment" spellcheck="true">// Otherwise you won't see an error in the console.</span>
+        console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">"error loading the list of users"</span><span class="token punctuation">,</span> error<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//this.loadingError$.next(true)</span>
+        <span class="token keyword">return</span> <span class="token function">of</span><span class="token punctuation">(</span>error<span class="token punctuation">.</span>message<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">export</span> <span class="token keyword">interface</span> <span class="token class-name">User</span> <span class="token punctuation">{</span>
+  name<span class="token punctuation">:</span> <span class="token keyword">string</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></div></code></pre>
+<p>通过努力，我们将正常数据流和异常数据流行进行了分离，正常数据流通过 users$ Observable 获取，如果数据正在加载过程中或者加载过程中出现异常，将会显示 loadingOrError template 所定义的内容。</p>
+<p>如果出现异常，loadingOrError template 将会向用户展示异常的详细信息。接下来我们将 loadingOrError 抽取为一个组件，以便在其他页面中重用。</p>
+
+        <h2 id="3--%E9%87%8D%E6%9E%84%EF%BC%8C%E6%8A%BD%E5%8F%96%E6%88%90%E5%8F%AF%E9%87%8D%E7%94%A8%E7%BB%84%E4%BB%B6" class="docs-header-link">
+          <span header-link="3--%E9%87%8D%E6%9E%84%EF%BC%8C%E6%8A%BD%E5%8F%96%E6%88%90%E5%8F%AF%E9%87%8D%E7%94%A8%E7%BB%84%E4%BB%B6"></span>
+          3. 重构，抽取成可重用组件
+        </h2>
+      <p>我们将处理加载过程和展示错误信息的部分抽取成组件，暂且命名为 loadingOrError</p>
+<p>LoadingOrError.component.ts</p>
+<pre class="language-ts"><code class="language-ts"><div><span class="token keyword">import</span> <span class="token punctuation">{</span> CommonModule<span class="token punctuation">,</span> NgIfContext <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@angular/common"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> Component<span class="token punctuation">,</span> Input<span class="token punctuation">,</span> TemplateRef<span class="token punctuation">,</span> ViewChild <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@angular/core"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> Observable<span class="token punctuation">,</span> of <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"rxjs"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> catchError<span class="token punctuation">,</span> ignoreElements<span class="token punctuation">,</span> shareReplay<span class="token punctuation">,</span> tap <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"rxjs/operators"</span><span class="token punctuation">;</span>
+
+@<span class="token function">Component</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  standalone<span class="token punctuation">:</span> <span class="token keyword">true</span><span class="token punctuation">,</span>
+  selector<span class="token punctuation">:</span> <span class="token string">"loading-or-error"</span><span class="token punctuation">,</span>
+  templateUrl<span class="token punctuation">:</span> <span class="token string">"./LoadingOrError.component.html"</span><span class="token punctuation">,</span>
+  imports<span class="token punctuation">:</span> <span class="token punctuation">[</span>CommonModule<span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">LoadingOrErrorComponent</span> <span class="token punctuation">{</span>
+  loadingError$<span class="token punctuation">:</span> Observable<span class="token operator">&lt;</span><span class="token keyword">string</span><span class="token operator">></span><span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true">/**
+   * The loading wrapper that should be used to show the loading/error state
+   */</span>
+  @<span class="token function">Input</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">set</span> <span class="token function">loadingWrapper</span><span class="token punctuation">(</span>data<span class="token punctuation">:</span> Observable<span class="token operator">&lt;</span><span class="token keyword">any</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>loadingError$ <span class="token operator">=</span> data<span class="token punctuation">.</span><span class="token function">pipe</span><span class="token punctuation">(</span>
+      <span class="token function">shareReplay</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">ignoreElements</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token function">catchError</span><span class="token punctuation">(</span><span class="token punctuation">(</span>error<span class="token punctuation">:</span> <span class="token keyword">any</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> <span class="token punctuation">{</span>
+        console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>error<span class="token punctuation">.</span>message<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token function">of</span><span class="token punctuation">(</span>error<span class="token punctuation">.</span>message<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment" spellcheck="true">/**
+   * A configurable error message for error cases.
+   */</span>
+  @<span class="token function">Input</span><span class="token punctuation">(</span><span class="token punctuation">)</span> userDefinedMessage<span class="token punctuation">:</span> <span class="token keyword">string</span> <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></div></code></pre>
+<blockquote>
+<p>注意，这里我们添加了 ignoreElements rxjs 算子, 这样正常数据流就被过滤掉了，从而形成一个纯粹的异常数据流。</p>
+</blockquote>
+<p>LoadingOrError.component.html</p>
+<pre class="language-html"><code class="language-html"><div><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">*ngIf</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>loadingError$ | async as originalErrorMsg; else loading<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  {{ userDefinedMessage + ' | ' + originalErrorMsg }}
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ng-template</span> <span class="token attr-name">#loading</span><span class="token punctuation">></span></span>Loading...<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>ng-template</span><span class="token punctuation">></span></span></div></code></pre>
+<p>这样我们就将 loading 和 error handling 抽取出成了一个独立组件。接下来我们在业务处理页面使用它。</p>
+
+        <h2 id="4--%E4%BD%BF%E7%94%A8-loadingorerror-%E7%BB%84%E4%BB%B6" class="docs-header-link">
+          <span header-link="4--%E4%BD%BF%E7%94%A8-loadingorerror-%E7%BB%84%E4%BB%B6"></span>
+          4. 使用 LoadingOrError 组件
+        </h2>
+      <p>src/app/app.component.html</p>
+<pre class="language-html"><code class="language-html"><div><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">*ngIf</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>users$ | async as users; else loading<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">*ngFor</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>let user of $any(users)<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>{{ user.name }}<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ng-template</span> <span class="token attr-name">#loading</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>loading-or-error</span>
+        <span class="token attr-name">#loadingOrError</span>
+        <span class="token attr-name">[loadingWrapper]</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>users$<span class="token punctuation">"</span></span>
+        <span class="token attr-name">[userDefinedMessage]</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span><span class="token punctuation">'</span>Error loading the list of users<span class="token punctuation">'</span><span class="token punctuation">"</span></span>
+    <span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>loading-or-error</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>ng-template</span><span class="token punctuation">></span></span>
+</div></code></pre>
+<p>从以上使用方法可以看出，我们依然保持了 async pipe 的写法，对 html template, 中 async pipe 部分没有任何侵入性，对数据流的创建过程也没有任何的侵入性。</p>
+<p>src/app/app.component.ts</p>
+<pre class="language-ts"><code class="language-ts"><div><span class="token keyword">import</span> <span class="token punctuation">{</span> ChangeDetectionStrategy<span class="token punctuation">,</span> Component <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@angular/core"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> Observable <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"rxjs"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> TestDataService<span class="token punctuation">,</span> User <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"./services/TestDataService"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> HttpClient <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@angular/common/http"</span><span class="token punctuation">;</span>
+
+@<span class="token function">Component</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  selector<span class="token punctuation">:</span> <span class="token string">"app-root"</span><span class="token punctuation">,</span>
+  changeDetection<span class="token punctuation">:</span> ChangeDetectionStrategy<span class="token punctuation">.</span>OnPush<span class="token punctuation">,</span>
+  templateUrl<span class="token punctuation">:</span> <span class="token string">"./app.component.html"</span><span class="token punctuation">,</span>
+  styleUrls<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">"./app.component.scss"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">AppComponent</span> <span class="token punctuation">{</span>
+  users$<span class="token punctuation">:</span> Observable<span class="token operator">&lt;</span>User<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">></span><span class="token punctuation">;</span>
+
+  <span class="token keyword">constructor</span><span class="token punctuation">(</span>httpClient<span class="token punctuation">:</span> HttpClient<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>users$ <span class="token operator">=</span> httpClient<span class="token punctuation">.</span><span class="token keyword">get</span><span class="token operator">&lt;</span>User<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token string">"/api/users"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></div></code></pre>
+
+        <h2 id="5--%E6%80%BB%E7%BB%93" class="docs-header-link">
+          <span header-link="5--%E6%80%BB%E7%BB%93"></span>
+          5. 总结
+        </h2>
+      <p>我们组件的代码现在简单多了：我们在一个通用的、可重用/可配置的组件中处理了错误和加载情况，在几乎不改变原有代码结构的基础上，添加了错误处理功能，它为我们节省了一些代码，否则我们必须在每个组件中编写这些代码。</p>
+<p>我很好奇你在项目中是如何处理这些案例的！如果您使用下面的评论框谈论您的解决方案和上面的解决方案，我将非常高兴。</p>
+
+        <h2 id="6--%E7%9B%B8%E5%85%B3%E6%96%87%E7%AB%A0" class="docs-header-link">
+          <span header-link="6--%E7%9B%B8%E5%85%B3%E6%96%87%E7%AB%A0"></span>
+          6. 相关文章
+        </h2>
+      <p>最新更新以及更多 Angular 相关文章请访问 <a target="_blank" href="https://www.pengtech.net/angular/">Angular 专题 | 鹏叔的技术博客</a></p>
+
+        <h2 id="7--%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3" class="docs-header-link">
+          <span header-link="7--%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3"></span>
+          7. 参考文档
+        </h2>
+      <div class="dg-paragraph"><a target="_blank" href="https://eliteionic.com/tutorials/handle-errors-reactively-when-using-async-pipe/">How to Handle Errors Reactively when Using the Async Pipe</a></div>
+<p>[Error Handling with Angular`s async Pipe](<a target="_blank" href="https://sebastian-holstein.de/post/2018-02-26-error-handling-angular/">https://sebastian-holstein.de/post/2018-02-26-error-handling-angular/</a>)</p>

@@ -1,0 +1,322 @@
+<p>Angular 16 于 2023 年 11 月 8 日发布.</p>
+<p>今天，我计划向您介绍如何升级到 Angular 17。</p>
+<!-- more -->
+
+
+        <h2 id="1--%E5%8D%87%E7%BA%A7%E5%89%8D%E5%87%86%E5%A4%87" class="docs-header-link">
+          <span header-link="1--%E5%8D%87%E7%BA%A7%E5%89%8D%E5%87%86%E5%A4%87"></span>
+          1. 升级前准备
+        </h2>
+      <p>升级前到 Angular 17 之前, 请确保当前 Angular 已经升级到 Angular 16, 并完成了 Angular 16 所有的迁移任务. 如果没有完成 Angular 13 到 14, 14 到 15, 以及 15 到 16 的升级任务, 可以参考我的博客<a target="_blank" href="https://www.pengtech.net/angular/angular_upgrade_13_to_15.html">从 Angular 13 升级到 Angular 15 | 鹏叔的技术博客</a>，<a target="_blank" href="https://www.pengtech.net/angular/Upgrade_to_Angular_16.html">一步一步升级到 Angular 16</a></p>
+<p>升级前需要了解 Angular 17 与 Typescript, nodejs 等的版本兼容信息. 可以参考<a target="_blank" href="https://angular.io/guide/versions">Actively supported versions</a></p>
+<p>Actively supported versions</p>
+<table>
+<thead>
+<tr>
+<th align="left">ANGULAR</th>
+<th align="left">NODE.JS</th>
+<th align="left">TYPESCRIPT</th>
+<th align="left">RXJS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">17.1.0</td>
+<td align="left">^18.13.0 || ^20.9.0</td>
+<td align="left">&gt;=5.2.0 &lt;5.4.0</td>
+<td align="left">^6.5.3 || ^7.4.0</td>
+</tr>
+<tr>
+<td align="left">17.0.x</td>
+<td align="left">^18.13.0 || ^20.9.0</td>
+<td align="left">&gt;=5.2.0 &lt;5.3.0</td>
+<td align="left">^6.5.3 || ^7.4.0</td>
+</tr>
+<tr>
+<td align="left">16.1.x || 16.2.x</td>
+<td align="left">^16.14.0 || ^18.10.0</td>
+<td align="left">&gt;=4.9.3 &lt;5.2.0</td>
+<td align="left">^6.5.3 || ^7.4.0</td>
+</tr>
+<tr>
+<td align="left">16.0.x</td>
+<td align="left">^16.14.0 || ^18.10.0</td>
+<td align="left">&gt;=4.9.3 &lt;5.1.0</td>
+<td align="left">^6.5.3 || ^7.4.0</td>
+</tr>
+<tr>
+<td align="left">15.1.x || 15.2.x</td>
+<td align="left">^14.20.0 || ^16.13.0 || ^18.10.0</td>
+<td align="left">&gt;=4.8.2 &lt;5.0.0</td>
+<td align="left">^6.5.3 || ^7.4.0</td>
+</tr>
+<tr>
+<td align="left">15.0.x</td>
+<td align="left">^14.20.0 || ^16.13.0 || ^18.10.0</td>
+<td align="left">~4.8.2</td>
+<td align="left">^6.5.3 || ^7.4.0</td>
+</tr>
+</tbody></table>
+
+        <h3 id="1-1--%E5%8D%87%E7%BA%A7-nodejs" class="docs-header-link">
+          <span header-link="1-1--%E5%8D%87%E7%BA%A7-nodejs"></span>
+          1.1. 升级 Nodejs
+        </h3>
+      <p>可以参考我的博客<a target="_blank" href="https://www.pengtech.net/nodejs/install_and_config_nodejs.html">安装并配置 nodejs</a>, 进行安装升级和配置.</p>
+<p>对于 Angular 17 来说, 建议升级到 v18.13.0 或者 v20.9.0</p>
+
+        <h3 id="1-2--%E5%8D%87%E7%BA%A7-angular-%E4%BB%A5%E5%8F%8A-typescript" class="docs-header-link">
+          <span header-link="1-2--%E5%8D%87%E7%BA%A7-angular-%E4%BB%A5%E5%8F%8A-typescript"></span>
+          1.2. 升级 Angular 以及 Typescript
+        </h3>
+      <p>升级 Nodejs 后, 需要重新安装配置 angular cli, 此步骤可用参考我的博客<a target="_blank" href="https://www.pengtech.net/angular/angular2_installation.html">Angular CLI 安装和使用</a>, Angular 建议安装最新版本 16.2.10</p>
+<p>总结下来也就以下几步:</p>
+<pre class="language-bash"><code class="language-bash"><div>
+<span class="token comment" spellcheck="true"># 安装 typescript</span>
+<span class="token function">npm</span> i -g typescript@5.3.2
+<span class="token comment" spellcheck="true"># 安装 Angular CLI</span>
+<span class="token function">npm</span> <span class="token function">install</span> -g @angular/cli@17.3.2
+<span class="token comment" spellcheck="true"># 或者</span>
+cnpm <span class="token function">install</span> -g @angular/cli@17.3.2
+</div></code></pre>
+
+        <h2 id="2--%E5%8D%87%E7%BA%A7-angular-%E5%88%B0-v17" class="docs-header-link">
+          <span header-link="2--%E5%8D%87%E7%BA%A7-angular-%E5%88%B0-v17"></span>
+          2. 升级 Angular 到 v17
+        </h2>
+      <p>前面得准备工作完成后, 接下来就是重要得步骤, 升级 Angular 应用程序了.</p>
+<p>升级前建议您先到<a target="_blank" href="https://update.angular.io/?l=3&amp;v=16.0-17.0">https://update.angular.io/?l=3&amp;v=16.0-17.0</a> 阅读一下有哪些更新, 以及官方建议的步骤, 做到心中有数.</p>
+<p>另外建议备份程序, 切换到新的分支, 如果不成功, 可以立即回撤.</p>
+
+        <h3 id="2-1--%E5%8D%87%E7%BA%A7-angular-cli,-core-%E5%92%8C-cdk" class="docs-header-link">
+          <span header-link="2-1--%E5%8D%87%E7%BA%A7-angular-cli,-core-%E5%92%8C-cdk"></span>
+          2.1. 升级 angular cli, core 和 cdk
+        </h3>
+      <p>首先运行以下命令, 通常情况下不会成功, 但是会列出一些依赖关系问题, 确定一下依赖关系不存在严重问题, 可以使用--force 选项继续更新.</p>
+<pre class="language-bash"><code class="language-bash"><div>
+<span class="token function">ng</span> update @angular/core@17 @angular/cli@17
+</div></code></pre>
+
+        <h3 id="2-2--%E5%8D%87%E7%B4%9A%E4%BE%9D%E8%B3%B4%E5%8C%85" class="docs-header-link">
+          <span header-link="2-2--%E5%8D%87%E7%B4%9A%E4%BE%9D%E8%B3%B4%E5%8C%85"></span>
+          2.2. 升級依賴包
+        </h3>
+      <p>升級完 Angular 內核以及 cli 以后，再升级第三方依赖包，例如：</p>
+<pre class="language-bash"><code class="language-bash"><div>
+ <span class="token string">"ngx-markdown"</span><span class="token keyword">:</span> <span class="token string">"^16.0.0"</span>,  <span class="token operator">==</span><span class="token operator">></span> <span class="token string">"ngx-markdown"</span><span class="token keyword">:</span> <span class="token string">"^17.1.1"</span>,
+ <span class="token string">"ngx-owl-carousel-o"</span><span class="token keyword">:</span> <span class="token string">"^16.0.0"</span>, <span class="token operator">==</span><span class="token operator">></span>  <span class="token string">"ngx-owl-carousel-o"</span><span class="token keyword">:</span> <span class="token string">"^17.0.0"</span>,
+ <span class="token string">"ngx-quill"</span><span class="token keyword">:</span> <span class="token string">"^23.0.0"</span>, <span class="token operator">==</span><span class="token operator">></span> <span class="token string">"ngx-quill"</span><span class="token keyword">:</span> <span class="token string">"^25.1.2"</span>,
+</div></code></pre>
+
+        <h2 id="3--%E4%BF%AE%E6%94%B9-angular-json-%E9%85%8D%E7%BD%AE" class="docs-header-link">
+          <span header-link="3--%E4%BF%AE%E6%94%B9-angular-json-%E9%85%8D%E7%BD%AE"></span>
+          3. 修改 angular.json 配置
+        </h2>
+      
+        <h3 id="3-1--%E4%BF%AE%E6%94%B9-builder" class="docs-header-link">
+          <span header-link="3-1--%E4%BF%AE%E6%94%B9-builder"></span>
+          3.1. 修改 builder
+        </h3>
+      <p>ng build 从单纯编译 client-side application 变成既要编译 client-side 又要编译 server-side application</p>
+<pre class="language-diff"><code class="language-diff"><div>
+       "architect": {
+         "build": {
+<span class="token deleted">-          "builder": "@angular-devkit/build-angular:browser",</span>
+<span class="token inserted">+          "builder": "@angular-devkit/build-angular:application",</span>
+
+</div></code></pre>
+
+        <h3 id="3-2--%E4%BF%AE%E6%94%B9-polyfills-%E9%85%8D%E7%BD%AE" class="docs-header-link">
+          <span header-link="3-2--%E4%BF%AE%E6%94%B9-polyfills-%E9%85%8D%E7%BD%AE"></span>
+          3.2. 修改 polyfills 配置
+        </h3>
+      <p>polyfills 由之前的字符串型变成了数组型</p>
+<pre class="language-diff"><code class="language-diff"><div>
+<span class="token deleted">-            "polyfills": "src/polyfills.ts",</span>
+<span class="token inserted">+            "browser": "src/main.ts",</span>
+<span class="token inserted">+            "polyfills": [</span>
+<span class="token inserted">+              "src/polyfills.ts",</span>
+<span class="token inserted">+              "zone.js"</span>
+<span class="token inserted">+            ],</span>
+</div></code></pre>
+
+        <h3 id="3-3--%E4%BF%AE%E6%94%B9-pwa-%E9%85%8D%E7%BD%AE" class="docs-header-link">
+          <span header-link="3-3--%E4%BF%AE%E6%94%B9-pwa-%E9%85%8D%E7%BD%AE"></span>
+          3.3. 修改 PWA 配置
+        </h3>
+      <p>如果项目 enable 了 pwa, 则需要修改 pwa 配置，pwa 由以前的两个属性缩减为了一个属性。</p>
+<pre class="language-diff"><code class="language-diff"><div><span class="token deleted">-            "serviceWorker": true,</span>
+<span class="token deleted">-            "ngswConfigPath": "ngsw-config.json"</span>
+<span class="token inserted">+            "serviceWorker": "ngsw-config.json"</span></div></code></pre>
+
+        <h3 id="3-4--%E6%9B%BF%E6%8D%A2-browser-target" class="docs-header-link">
+          <span header-link="3-4--%E6%9B%BF%E6%8D%A2-browser-target"></span>
+          3.4. 替换 browser target
+        </h3>
+      <pre class="language-diff"><code class="language-diff"><div>
+"configurations": {
+             "production": {
+<span class="token deleted">-              "browserTarget": "angular-demo:build:production"</span>
+<span class="token inserted">+              "buildTarget": "angular-demo:build:production"</span>
+             },
+             "development": {
+<span class="token deleted">-              "browserTarget": "angular-demo:build:development"</span>
+<span class="token deleted">-            },</span>
+<span class="token inserted">+              "buildTarget": "angular-demo:build:development"</span>
+<span class="token inserted">+            }</span>
+</div></code></pre>
+
+        <h3 id="3-5--%E5%8D%87%E7%BA%A7-angular-universal" class="docs-header-link">
+          <span header-link="3-5--%E5%8D%87%E7%BA%A7-angular-universal"></span>
+          3.5. 升级 Angular universal
+        </h3>
+      <p>在版本 17 nguniversal 已被移到 Angular CLI repo 中。代码已经被重构和重命名（现在主要在@angular/ssr 下），但核心功能和架构没有改变。</p>
+<p>现在 Angular CLI 直接支持服务器端渲染和构建时预渲染等通用功能，不需要与 Universal 单独集成。</p>
+<p>如果项目中使用了 Angular universal, 还需要一些手工操作来升级 Angular universal。</p>
+
+        <h4 id="3-5-1--%E4%BF%AE%E6%94%B9-package-json" class="docs-header-link">
+          <span header-link="3-5-1--%E4%BF%AE%E6%94%B9-package-json"></span>
+          3.5.1. 修改 package.json
+        </h4>
+      <p>从 angular v17 开始，@nguniversal 项目已经被整合到 Angular 主项目，所以需要替换相关依赖包，以及修改 ssr 相关配置。</p>
+<p>删除@nguniversal/express-engine，引入@angular/ssr</p>
+<pre class="language-diff"><code class="language-diff"><div><span class="token deleted">-    "@nguniversal/express-engine": "16.2.0",</span>
+<span class="token inserted">+    "@angular/ssr": "^17.3.2",</span></div></code></pre>
+
+        <h4 id="3-5-2--%E4%BF%AE%E6%94%B9-angular-json-%E9%85%8D%E7%BD%AE" class="docs-header-link">
+          <span header-link="3-5-2--%E4%BF%AE%E6%94%B9-angular-json-%E9%85%8D%E7%BD%AE"></span>
+          3.5.2. 修改 angular.json 配置
+        </h4>
+      <pre class="language-bash"><code class="language-bash"><div>
+    <span class="token string">"server"</span><span class="token keyword">:</span> <span class="token string">"src/main.server.ts"</span>,
+    <span class="token string">"prerender"</span><span class="token keyword">:</span> true,
+    <span class="token string">"ssr"</span><span class="token keyword">:</span> <span class="token punctuation">{</span>
+      <span class="token string">"entry"</span><span class="token keyword">:</span> <span class="token string">"server.ts"</span>
+    <span class="token punctuation">}</span>
+</div></code></pre>
+
+        <h4 id="3-5-3--%E4%BF%AE%E6%94%B9-tsconfig-app-json" class="docs-header-link">
+          <span header-link="3-5-3--%E4%BF%AE%E6%94%B9-tsconfig-app-json"></span>
+          3.5.3. 修改 tsconfig.app.json
+        </h4>
+      <pre class="language-diff"><code class="language-diff"><div>
+   "files": [
+     "src/main.ts",
+<span class="token inserted">+    "src/main.server.ts",</span>
+<span class="token inserted">+    "server.ts",</span>
+     "src/polyfills.ts"
+   ],
+
+</div></code></pre>
+
+        <h2 id="4--trouble-shooting" class="docs-header-link">
+          <span header-link="4--trouble-shooting"></span>
+          4. trouble shooting
+        </h2>
+      
+        <h3 id="4-1--issue-1" class="docs-header-link">
+          <span header-link="4-1--issue-1"></span>
+          4.1. issue 1
+        </h3>
+      <pre class="language-bash"><code class="language-bash"><div>Dynamic require is not supported
+Error: Cannot <span class="token function">find</span> module <span class="token string">'./landing-page.component-UB6FKJPP.mjs'</span></div></code></pre>
+<p>参考： <a target="_blank" href="https://github.com/angular/angular/issues/54542">Dynamic require is not supported</a></p>
+<p>解决办法： 删除.browserslist 文件</p>
+
+        <h3 id="4-2--issue-3" class="docs-header-link">
+          <span header-link="4-2--issue-3"></span>
+          4.2. issue 3
+        </h3>
+      <pre class="language-bash"><code class="language-bash"><div>
+ReferenceError: localStorage is not defined
+</div></code></pre>
+<p>解决办法参考：</p>
+<ul>
+<li><a target="_blank" href="https://bbs.huaweicloud.com/blogs/384415">Angular 服务器端渲染应用的一个错误消息 localStorage is not defined</a></li>
+<li></li>
+</ul>
+<ol>
+<li>使用 Angular 的依赖注入（Dependency Injection, DI）
+Angular 提供了一种机制，允许你在应用程序中使用浏览器的 API，而不需要直接访问全局对象。你可以使用 Angular 的 DI 系统来注入 localStorage。</li>
+</ol>
+<pre class="language-ts"><code class="language-ts"><div><span class="token keyword">import</span> <span class="token punctuation">{</span> Component<span class="token punctuation">,</span> Inject<span class="token punctuation">,</span> NgModule <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@angular/core"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> LOCAL_STORAGE <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@ng-web-apis/common"</span><span class="token punctuation">;</span>
+
+@<span class="token function">Component</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// ...</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">SomeComponent</span> <span class="token punctuation">{</span>
+  <span class="token keyword">constructor</span><span class="token punctuation">(</span>@<span class="token function">Inject</span><span class="token punctuation">(</span>LOCAL_STORAGE<span class="token punctuation">)</span> <span class="token keyword">private</span> localStorage<span class="token punctuation">:</span> Storage<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 现在你可以安全地使用localStorage</span>
+    <span class="token keyword">const</span> item <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>localStorage<span class="token punctuation">.</span><span class="token function">getItem</span><span class="token punctuation">(</span><span class="token string">"key"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></div></code></pre>
+<ol start="2">
+<li>服务器端渲染时使用 UNIVERSAL_LOCAL_STORAGE
+在服务器端渲染时，你需要提供一个 localStorage 的实现。你可以使用@ng-web-apis/universal 包中的 UNIVERSAL_LOCAL_STORAGE 来实现这一点。</li>
+</ol>
+<pre class="language-ts"><code class="language-ts"><div><span class="token keyword">import</span> <span class="token punctuation">{</span> NgModule <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@angular/core"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> ServerModule <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@angular/platform-server"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> AppComponent <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"./app.component"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> UNIVERSAL_LOCAL_STORAGE <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@ng-web-apis/universal"</span><span class="token punctuation">;</span>
+
+@<span class="token function">NgModule</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  imports<span class="token punctuation">:</span> <span class="token punctuation">[</span>ServerModule <span class="token comment" spellcheck="true">/* ...其他模块... */</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  providers<span class="token punctuation">:</span> <span class="token punctuation">[</span>UNIVERSAL_LOCAL_STORAGE<span class="token punctuation">]</span><span class="token punctuation">,</span>
+  bootstrap<span class="token punctuation">:</span> <span class="token punctuation">[</span>AppComponent<span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">AppServerModule</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></div></code></pre>
+<ol start="3">
+<li>条件渲染和自定义指令
+如果你的应用中有某些功能只在客户端运行，你可以使用条件渲染来避免在服务器端渲染这些功能。例如，你可以使用*ngIf 指令或者创建自定义指令来实现这一点。</li>
+</ol>
+<pre class="language-ts"><code class="language-ts"><div><span class="token keyword">import</span> <span class="token punctuation">{</span> Component<span class="token punctuation">,</span> Inject<span class="token punctuation">,</span> PLATFORM_ID <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@angular/core'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> isPlatformServer <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@angular/common'</span><span class="token punctuation">;</span>
+
+@<span class="token function">Component</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  selector<span class="token punctuation">:</span> <span class="token string">'ram-root'</span><span class="token punctuation">,</span>
+  template<span class="token punctuation">:</span> <span class="token string">'&lt;some-comp *ngIf="isServer">&lt;/some-comp>'</span><span class="token punctuation">,</span>
+  styleUrls<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'./app.component.less'</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">AppComponent</span> <span class="token punctuation">{</span>
+  isServer <span class="token operator">=</span> <span class="token function">isPlatformServer</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>platformId<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">constructor</span><span class="token punctuation">(</span>@<span class="token function">Inject</span><span class="token punctuation">(</span>PLATFORM_ID<span class="token punctuation">)</span> <span class="token keyword">private</span> platformId<span class="token punctuation">:</span> Object<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token number">4</span><span class="token punctuation">.</span> 环境检测和默认值
+在某些情况下，你可能需要在代码中检测当前环境是否为服务器端，如果是，则提供一个默认值或者空对象，避免访问localStorage。
+
+<span class="token keyword">let</span> storage <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> localStorage <span class="token operator">!==</span> <span class="token string">'undefined'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  storage <span class="token operator">=</span> localStorage<span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// 为服务器环境提供默认实现或者空对象</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">// 现在你可以安全地使用storage对象</span>
+<span class="token keyword">const</span> item <span class="token operator">=</span> storage<span class="token punctuation">.</span><span class="token function">getItem</span><span class="token punctuation">(</span><span class="token string">'key'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</div></code></pre>
+<ol start="5">
+<li>使用第三方库
+还有一些第三方库可以帮助你处理服务器端渲染时的 localStorage 问题，例如@ngx-webstorage/core 或者 ngx-store.</li>
+</ol>
+<p>通过以上方法，你可以有效地解决 Angular 17 中 localStorage is not defined 的问题，确保你的应用在服务器端渲染时也能正常工作。记得在实际部署和开发过程中，根据你的应用需求和架构选择合适的解决方案。</p>
+
+        <h3 id="4-3--issue-3" class="docs-header-link">
+          <span header-link="4-3--issue-3"></span>
+          4.3. issue 3
+        </h3>
+      <pre class="language-bash"><code class="language-bash"><div>NG02801: Angular detected that <span class="token variable"><span class="token variable">`</span>HttpClient<span class="token variable">`</span></span> is not configured to use <span class="token variable"><span class="token variable">`</span>fetch<span class="token variable">`</span></span> APIs. It's strongly recommended to <span class="token function">enable</span> <span class="token variable"><span class="token variable">`</span>fetch<span class="token variable">`</span></span> <span class="token keyword">for</span> applications that use Server-Side Rendering <span class="token keyword">for</span> better performance and compatibility. To <span class="token function">enable</span> <span class="token variable"><span class="token variable">`</span>fetch<span class="token variable">`</span></span>, add the <span class="token variable"><span class="token variable">`</span>withFetch<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token variable">`</span></span> to the <span class="token variable"><span class="token variable">`</span>provideHttpClient<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token variable">`</span></span> call at the root of the application.</div></code></pre>
+<p>原因参考： <a target="_blank" href="https://stackoverflow.com/questions/77512654/angular-detected-that-httpclient-is-not-configured-to-use-fetch-apis-angul">https://stackoverflow.com/questions/77512654/angular-detected-that-httpclient-is-not-configured-to-use-fetch-apis-angul</a></p>
+<p>解决方案：</p>
+<p>修改 app.config.ts,添加 provideHttpClient(withFetch()),</p>
+
+        <h2 id="5--angular-%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0" class="docs-header-link">
+          <span header-link="5--angular-%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0"></span>
+          5. Angular 系列文章
+        </h2>
+      <p>最新更新以及更多 Angular 相关文章请访问 <a target="_blank" href="https://www.pengtech.net/angular/">Angular 合集 | 鹏叔的技术博客</a></p>
+
+        <h2 id="6--%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3" class="docs-header-link">
+          <span header-link="6--%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3"></span>
+          6. 参考文档
+        </h2>
+      <div class="dg-paragraph"><a target="_blank" href="https://medium.com/@ahmad.g.mustafa/upgrade-to-angular-16-step-by-step-e23d2963a2a8">Upgrade to Angular 16 step by step</a></div>

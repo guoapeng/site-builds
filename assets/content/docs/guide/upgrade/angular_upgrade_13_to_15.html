@@ -1,0 +1,263 @@
+
+        <h2 id="1--%E5%89%8D%E8%A8%80" class="docs-header-link">
+          <span header-link="1--%E5%89%8D%E8%A8%80"></span>
+          1. 前言
+        </h2>
+      <p>升级应用程序或者框架是软件生命周期中非常重要的一项活动. 因为其有风险性, 很多人不愿意去做, 久而久之随着技术债务的积累变成了一件不能去做的事情.</p>
+<p>在我的职业生涯中见到过很大这样逐渐失去生命活力的系统, 这里就不具体举例了, 以免引起不必要的争论, 明白的人自然明白.</p>
+<!-- more -->
+
+<p>本文最新更新发布于<a target="_blank" href="https://www.pengtech.net/angular/angular_upgrade_13_to_15.html">从 Angular 13 升级到 Angular 15 | 鹏叔的技术博客</a></p>
+<p>其中的风险, 主要来自新旧版本的不兼容性. 如果兼容旧版本, 无疑是库开发者负责任承担起了这种风险, 但是也导致库变得臃肿, 因循守旧, 开发低效, 逐渐地失去活力. 如果库开发者一路更新向前, 不考虑向前兼容, 库开发走得轻快了, 也该库或者框架的使用者带来了很多创新性的体验, 但是把兼容性风险留给了使用者. 在兼容性, 和创新节奏, 库的活力之间看似鱼和熊掌很难兼得.</p>
+<p>而 Angular 在兼容性和变革之间很好地为我们做出了一个榜样, 也是将来版本升级很好的榜样. 首先 Angular 是大胆变革的. 其主版本号没 6 个月就有一次变更, 自从 2016 年发布 Angular 2.x 版本后, 如今一直保持着相似的节奏, 一路升级到 Angular 16.x. 而每次主版本号的变更可能包含了大量的 breaking change 和新特性. 其中有好几个大版本之间差异是很大的. 而 Angular 是如何做到既大胆创新, 又兼顾历史遗留的呢? 那就是 Angular schematics, 它不是简单的代码生成工具. 它也是一个代码重构工具, 这样 Angular 就可以大版本变化是使用一个或多个 schematics 帮助老旧系统自动完成绝大多数的重构工作. 这样旧系统就可以轻松的升级到新版本的 Angular 了. 只要按照 Angular 提供的升级路线, 库或框架使用者就能轻松的完成升级 而 Angular 也不必在新的库中考虑老用户一些传统的习惯和使用方式, 做到轻松上阵.</p>
+<p>无独有偶, gitlab 的升级方式也是类似的, 在大版本之间提供 postscript 来弥合新旧版本的差异, 并给使用者提供了清晰的升级路线图. 所以可以预测在将来的开发中, 这种在新旧版本之间使用 postscript 或 Schematics 的方式将逐渐成为一种版本升级的趋势. 开发过库代码的人肯定知道向前兼容是一件多么烧脑和让代码逻辑变得扭曲的事情.</p>
+<p>而这种方式带来的坏处就是, 升级变得不像以前那么简单了, 以前升级只需要改个数字, 而现在需要去查升级路线图, 还要执行相应的弥合裂缝的代码. 但是深入思考一下, 这种牺牲还是很值得的, 因为以前开发人员改一下版本号是轻松, 但是将潜在的问题留给了测试人员, 甚至留给了运维人员, 甚至更后, 变得越来越昂贵. 而现在有一条清晰的升级路线, 而这条路线是无数人踩过的, 心里总是会踏实很多.</p>
+
+        <h2 id="2--%E5%8D%87%E7%BA%A7%E5%89%8D%E7%9A%84%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C" class="docs-header-link">
+          <span header-link="2--%E5%8D%87%E7%BA%A7%E5%89%8D%E7%9A%84%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"></span>
+          2. 升级前的准备工作
+        </h2>
+      <p>升级前最好阅读一遍 Angular 14, 15 的 release notes. 本文讲述的是从 Angular 13 升级到 Angular 15, 所以需要阅读这两个 release notes: <a target="_blank" href="https://www.pengtech.net/angular/angular_14_update.html">Angular 14 release notes</a> 和
+<a target="_blank" href="https://www.pengtech.net/angular/angular_15_update.html">Angular 15 release notes</a></p>
+<p>里面详细描述了有那些 breaking change 那些新的弃用, 多我们的迁移工作会非常有帮助.</p>
+<p>另外我们需要阅读一下更新指南, 这个更新指南是一个动态的指南, 需要选择从哪个版本升级到哪个版本, 项目中用到了哪些特殊包, 在此基础上系统自动帮我们生成一份更新指南, 非常人性化, 这是 Angular 升级特殊之处, 也是很容易被忽视的一点. 更新指南可以在<a target="_blank" href="https://update.angular.io/">这里</a>找到</p>
+
+        <h2 id="3--%E5%BC%80%E5%A7%8B%E5%8D%87%E7%BA%A7" class="docs-header-link">
+          <span header-link="3--%E5%BC%80%E5%A7%8B%E5%8D%87%E7%BA%A7"></span>
+          3. 开始升级
+        </h2>
+      <p>由于本文的目标是从 Angular 13 升级到 Angular 15, 所以升级路径首先是从 Angular 13 升级到 Angular 14 再从 Angular 14 升级到 Angular 15, 不能一次性升级到 Angular 15.</p>
+
+        <h3 id="3-1--angular-13-%E5%8D%87%E7%BA%A7%E5%88%B0-angular-14" class="docs-header-link">
+          <span header-link="3-1--angular-13-%E5%8D%87%E7%BA%A7%E5%88%B0-angular-14"></span>
+          3.1. Angular 13 升级到 Angular 14
+        </h3>
+      
+        <h4 id="3-1-1--%E5%8D%87%E7%BA%A7%E5%89%8D%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C" class="docs-header-link">
+          <span header-link="3-1-1--%E5%8D%87%E7%BA%A7%E5%89%8D%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"></span>
+          3.1.1. 升级前准备工作
+        </h4>
+      <p>阅读 angular 13-14<a target="_blank" href="https://update.angular.io/?l=3&amp;v=13.0-14.0">更新指南</a></p>
+
+        <h4 id="3-1-2--%E6%AD%A5%E9%AA%A4%E4%B8%80:-%E6%9B%B4%E6%96%B0%E6%89%80%E6%9C%89-angular-%E7%9A%84%E7%BB%84%E4%BB%B6%E5%88%B0-14" class="docs-header-link">
+          <span header-link="3-1-2--%E6%AD%A5%E9%AA%A4%E4%B8%80:-%E6%9B%B4%E6%96%B0%E6%89%80%E6%9C%89-angular-%E7%9A%84%E7%BB%84%E4%BB%B6%E5%88%B0-14"></span>
+          3.1.2. 步骤一: 更新所有 Angular 的组件到 14
+        </h4>
+      <pre class="language-bash"><code class="language-bash"><div><span class="token function">ng</span> update @angular/core@14 @angular/cli@14 --force</div></code></pre>
+<p>注意，不加–force 无法正常升级。
+同时，还要事前事后都要 commit 一次。</p>
+
+        <h4 id="3-1-3--%E6%AD%A5%E9%AA%A4%E4%BA%8C:-%E5%8D%87%E7%BA%A7-angular-material-%E5%88%B0-v14" class="docs-header-link">
+          <span header-link="3-1-3--%E6%AD%A5%E9%AA%A4%E4%BA%8C:-%E5%8D%87%E7%BA%A7-angular-material-%E5%88%B0-v14"></span>
+          3.1.3. 步骤二: 升级 Angular Material 到 v14
+        </h4>
+      <pre class="language-bash"><code class="language-bash"><div><span class="token function">ng</span> update @angular/material@14 --force</div></code></pre>
+<p>该步骤只适用于使用了 Angular Material 的项目。</p>
+
+        <h4 id="3-1-4--%E6%AD%A5%E9%AA%A4%E4%B8%89:-%E6%9B%B4%E6%96%B0-eslint-%E5%88%B0-v14" class="docs-header-link">
+          <span header-link="3-1-4--%E6%AD%A5%E9%AA%A4%E4%B8%89:-%E6%9B%B4%E6%96%B0-eslint-%E5%88%B0-v14"></span>
+          3.1.4. 步骤三: 更新 eslint 到 v14
+        </h4>
+      <pre class="language-bash"><code class="language-bash"><div> <span class="token function">ng</span> update @angular-eslint/schematics@14</div></code></pre>
+<p>如果项目中使用了 angular-eslint, 可以使用以上命令升级到 v14。</p>
+
+        <h4 id="3-1-5--%E6%AD%A5%E9%AA%A4%E5%9B%9B%EF%BC%9A%E6%9B%B4%E6%96%B0%E4%B8%80%E4%BA%9B%E9%9D%9E-angular-%E5%AE%98%E6%96%B9%E7%9A%84%E7%BB%84%E4%BB%B6" class="docs-header-link">
+          <span header-link="3-1-5--%E6%AD%A5%E9%AA%A4%E5%9B%9B%EF%BC%9A%E6%9B%B4%E6%96%B0%E4%B8%80%E4%BA%9B%E9%9D%9E-angular-%E5%AE%98%E6%96%B9%E7%9A%84%E7%BB%84%E4%BB%B6"></span>
+          3.1.5. 步骤四：更新一些非 Angular 官方的组件
+        </h4>
+      <pre class="language-bash"><code class="language-bash"><div>
+<span class="token function">npm</span> i @angular/flex-layout@14.0.0-beta.41 ngx-markdown@14.0.1
+</div></code></pre>
+
+        <h4 id="3-1-6--%E6%AD%A5%E9%AA%A4%E4%BA%94%EF%BC%9A%E6%9B%B4%E6%96%B0-typescript-%E5%88%B0-4-6" class="docs-header-link">
+          <span header-link="3-1-6--%E6%AD%A5%E9%AA%A4%E4%BA%94%EF%BC%9A%E6%9B%B4%E6%96%B0-typescript-%E5%88%B0-4-6"></span>
+          3.1.6. 步骤五：更新 typescript 到 4.6
+        </h4>
+      <p>官方文档说，Angular 14 支持 4.6，没必要安装更新的 Typescript 版本，免得无谓的不兼容问题。</p>
+<pre class="language-bash"><code class="language-bash"><div><span class="token function">npm</span> <span class="token function">install</span> typescript@4.6.4 -D</div></code></pre>
+
+        <h4 id="3-1-7--%E6%AD%A5%E9%AA%A4%E5%85%AD%EF%BC%8C%E6%9B%B4%E6%96%B0%E4%BB%A3%E7%A0%81" class="docs-header-link">
+          <span header-link="3-1-7--%E6%AD%A5%E9%AA%A4%E5%85%AD%EF%BC%8C%E6%9B%B4%E6%96%B0%E4%BB%A3%E7%A0%81"></span>
+          3.1.7. 步骤六，更新代码
+        </h4>
+      <p>手动解决一些更新指南中的内容.</p>
+<p>另外一个问题，如果使用了 moment、lodash 这样的库，会报出一条 warning：</p>
+<blockquote>
+<p>material-moment-adapter.mjs depends on ‘moment’. CommonJS or AMD dependencies can cause optimization bailouts.</p>
+</blockquote>
+<p>官方文档：<a target="_blank" href="https://angular.io/guide/build#configuring-commonjs-dependencies">链接</a>
+答案是按如下更新 Angular.json</p>
+<pre class="language-json"><code class="language-json"><div><span class="token property">"allowedCommonJsDependencies"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token string">"lodash"</span><span class="token punctuation">,</span>
+        <span class="token string">"moment"</span>
+ <span class="token punctuation">]</span></div></code></pre>
+
+        <h4 id="3-1-8--%E6%AD%A5%E9%AA%A4%E4%B8%83%EF%BC%9A%E5%90%AF%E5%8A%A8%E7%A8%8B%E5%BA%8F,-%E6%89%8B%E5%8A%A8%E6%B5%8B%E8%AF%95" class="docs-header-link">
+          <span header-link="3-1-8--%E6%AD%A5%E9%AA%A4%E4%B8%83%EF%BC%9A%E5%90%AF%E5%8A%A8%E7%A8%8B%E5%BA%8F,-%E6%89%8B%E5%8A%A8%E6%B5%8B%E8%AF%95"></span>
+          3.1.8. 步骤七：启动程序, 手动测试
+        </h4>
+      <p>现在可以启动程序了 npm run start 或者 ng serve, 并进行一些测试和检查.</p>
+
+        <h3 id="3-2--angular-14-%E5%8D%87%E7%BA%A7%E5%88%B0-angular-15" class="docs-header-link">
+          <span header-link="3-2--angular-14-%E5%8D%87%E7%BA%A7%E5%88%B0-angular-15"></span>
+          3.2. Angular 14 升级到 Angular 15
+        </h3>
+      
+        <h4 id="3-2-1--%E5%8D%87%E7%BA%A7%E5%89%8D%E6%A3%80%E6%9F%A5%E4%B8%80%E4%B8%8B%E5%BD%93%E5%89%8D%E7%9A%84%E7%8E%AF%E5%A2%83" class="docs-header-link">
+          <span header-link="3-2-1--%E5%8D%87%E7%BA%A7%E5%89%8D%E6%A3%80%E6%9F%A5%E4%B8%80%E4%B8%8B%E5%BD%93%E5%89%8D%E7%9A%84%E7%8E%AF%E5%A2%83"></span>
+          3.2.1. 升级前检查一下当前的环境
+        </h4>
+      <p>升级前检查一下当前的环境, 做到心中有数.</p>
+<pre class="language-bash"><code class="language-bash"><div>
+<span class="token variable">$ng</span> version
+
+     _                      _                 ____ _     ___
+    / \   _ __   __ _ _   _<span class="token operator">|</span> <span class="token operator">|</span> __ _ _ __     / ___<span class="token operator">|</span> <span class="token operator">|</span>   <span class="token operator">|</span>_ _<span class="token operator">|</span>
+   / △ \ <span class="token operator">|</span> <span class="token string">'_ \ / _<span class="token variable"><span class="token variable">`</span> <span class="token operator">|</span> <span class="token operator">|</span> <span class="token operator">|</span> <span class="token operator">|</span> <span class="token operator">|</span>/ _<span class="token variable">`</span></span> | '</span>__<span class="token operator">|</span>   <span class="token operator">|</span> <span class="token operator">|</span>   <span class="token operator">|</span> <span class="token operator">|</span>    <span class="token operator">|</span> <span class="token operator">|</span>
+  / ___ \<span class="token operator">|</span> <span class="token operator">|</span> <span class="token operator">|</span> <span class="token operator">|</span> <span class="token punctuation">(</span>_<span class="token operator">|</span> <span class="token operator">|</span> <span class="token operator">|</span>_<span class="token operator">|</span> <span class="token operator">|</span> <span class="token operator">|</span> <span class="token punctuation">(</span>_<span class="token operator">|</span> <span class="token operator">|</span> <span class="token operator">|</span>      <span class="token operator">|</span> <span class="token operator">|</span>___<span class="token operator">|</span> <span class="token operator">|</span>___ <span class="token operator">|</span> <span class="token operator">|</span>
+ /_/   \_\_<span class="token operator">|</span> <span class="token operator">|</span>_<span class="token operator">|</span>\__, <span class="token operator">|</span>\__,_<span class="token operator">|</span>_<span class="token operator">|</span>\__,_<span class="token operator">|</span>_<span class="token operator">|</span>       \____<span class="token operator">|</span>_____<span class="token operator">|</span>___<span class="token operator">|</span>
+                <span class="token operator">|</span>___/
+
+
+Angular CLI: 14.2.0
+Node: 18.16.1 <span class="token punctuation">(</span>Unsupported<span class="token punctuation">)</span>
+Package Manager: <span class="token function">npm</span> 9.5.1
+OS: win32 x64
+
+Angular: 14.2.0
+<span class="token punctuation">..</span>. animations, cdk, cli, common, compiler, compiler-cli, core
+<span class="token punctuation">..</span>. elements, forms, language-service, material
+<span class="token punctuation">..</span>. platform-browser, platform-browser-dynamic, platform-server
+<span class="token punctuation">..</span>. router, service-worker
+
+Package                         Version
+---------------------------------------------------------
+@angular-devkit/architect       0.1402.1
+@angular-devkit/build-angular   14.2.1
+@angular-devkit/core            14.2.1
+@angular-devkit/schematics      14.2.0
+@nguniversal/builders           14.2.3
+@nguniversal/express-engine     14.2.3
+@schematics/angular             14.2.0
+rxjs                            7.4.0
+typescript                      4.8.4
+
+Warning: The current version of Node <span class="token punctuation">(</span>18.16.1<span class="token punctuation">)</span> is not supported by Angular.
+</div></code></pre>
+
+        <h4 id="3-2-2--%E5%8D%87%E7%BA%A7%E5%89%8D%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C" class="docs-header-link">
+          <span header-link="3-2-2--%E5%8D%87%E7%BA%A7%E5%89%8D%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"></span>
+          3.2.2. 升级前准备工作
+        </h4>
+      <p>阅读 angular 14-15<a target="_blank" href="https://update.angular.io/?l=3&amp;v=14.0-15.0">更新指南</a></p>
+<h5>3.2.2.1. 升级 node.js</h5><p>由于 Angular 15, 不再支持 node.js versions 14.[15-19].x or 16.[10-12].x. <a target="_blank" href="https://github.com/angular/angular/pull/47730">PR #47730</a></p>
+<p>目前兼容性比较好的是 14.20.x, 16.13.x 或者 18.10.x. 所以需要升级到其中某个版本</p>
+<p>Angular, node 以及 typscript 的兼容性可以参考表格 <a target="_blank" href="https://angular.io/guide/versions">Actively supported versions</a></p>
+<p>升级 Nodejs 可以参考我的博客</p>
+<div class="dg-paragraph"><a target="_blank" href="https://www.pengtech.net/nodejs/install_nvm_on_windows.html">Windows 上安装 nvm 和 nodejs</a></div>
+<p>或者</p>
+<div class="dg-paragraph"><a target="_blank" href="https://www.pengtech.net/nodejs/install_and_config_nodejs.html">安装并配置 nodejs</a></div>
+
+        <h4 id="3-2-3--%E5%8D%87%E7%BA%A7-typescript" class="docs-header-link">
+          <span header-link="3-2-3--%E5%8D%87%E7%BA%A7-typescript"></span>
+          3.2.3. 升级 typescript
+        </h4>
+      <p>Angular 15 中不再支持 typescript 4.8 以下的版本, 如果 typescript 不是 4.8 及以上版本, 需要升级 typescript
+下面以<a href="mailto:&#x74;&#x79;&#x70;&#101;&#115;&#99;&#x72;&#105;&#x70;&#116;&#x40;&#x34;&#46;&#x38;&#46;&#x34;">&#x74;&#x79;&#x70;&#101;&#115;&#99;&#x72;&#105;&#x70;&#116;&#x40;&#x34;&#46;&#x38;&#46;&#x34;</a>为例</p>
+<pre class="language-bash"><code class="language-bash"><div><span class="token function">npm</span> <span class="token function">install</span> typescript@4.8.4 -D</div></code></pre>
+
+        <h4 id="3-2-4--%E6%AD%A5%E9%AA%A4%E4%B8%80:-%E6%9B%B4%E6%96%B0%E6%89%80%E6%9C%89-angular-%E7%9A%84%E7%BB%84%E4%BB%B6%E5%88%B0-15" class="docs-header-link">
+          <span header-link="3-2-4--%E6%AD%A5%E9%AA%A4%E4%B8%80:-%E6%9B%B4%E6%96%B0%E6%89%80%E6%9C%89-angular-%E7%9A%84%E7%BB%84%E4%BB%B6%E5%88%B0-15"></span>
+          3.2.4. 步骤一: 更新所有 Angular 的组件到 15
+        </h4>
+      <pre class="language-bash"><code class="language-bash"><div><span class="token function">ng</span> update @angular/core@15 @angular/cli@15 @angular/material@15 --force</div></code></pre>
+<p>为了防止一些次要组件不兼容导致主要的升级过程失败, 可以加上--force 选项.</p>
+<p>当然如果你想再主要组件升级之前解决所有阻碍升级的问题, 则可以去掉 force 选项.</p>
+<p>如果使用到@angular-eslint, 可以使用如下命令更新@angular-eslint 到 v15</p>
+<pre class="language-bash"><code class="language-bash"><div><span class="token function">ng</span> update @angular-eslint/schematics@15</div></code></pre>
+
+        <h4 id="3-2-5--%E6%AD%A5%E9%AA%A4%E4%B8%89:-%E5%8D%87%E7%BA%A7@nguniversal-%E7%89%88%E6%9C%AC" class="docs-header-link">
+          <span header-link="3-2-5--%E6%AD%A5%E9%AA%A4%E4%B8%89:-%E5%8D%87%E7%BA%A7@nguniversal-%E7%89%88%E6%9C%AC"></span>
+          3.2.5. 步骤三: 升级@nguniversal 版本
+        </h4>
+      <p>如果项目中使用到@nguniversal, 需要将@nguniversal 升级到与 angular 15 匹配的版本</p>
+<pre class="language-bash"><code class="language-bash"><div>
+<span class="token function">npm</span> <span class="token function">install</span> --save @nguniversal/express-engine@15.2.1
+<span class="token function">npm</span> <span class="token function">install</span> -D @nguniversal/builders@15.2.1
+</div></code></pre>
+<p>完成这些步骤, 基本上应用程序可以编译, 运行! 除了 material 组件没有迁移到 MDC-based 组件, 应用的样式, 行为应该跟前一致.</p>
+
+        <h4 id="3-2-6--%E6%AD%A5%E9%AA%A4%E4%BA%8C:-%E8%BF%81%E7%A7%BB-legacy-angular-material-%E7%BB%84%E4%BB%B6%E5%88%B0-mdc-based-angular-material-%E7%BB%84%E4%BB%B6" class="docs-header-link">
+          <span header-link="3-2-6--%E6%AD%A5%E9%AA%A4%E4%BA%8C:-%E8%BF%81%E7%A7%BB-legacy-angular-material-%E7%BB%84%E4%BB%B6%E5%88%B0-mdc-based-angular-material-%E7%BB%84%E4%BB%B6"></span>
+          3.2.6. 步骤二: 迁移 Legacy Angular material 组件到 MDC-based Angular material 组件
+        </h4>
+      <p>因为从 Angular 14 到 15, material design 组件发生了比较大的变化, 所以需要执行这一步骤.</p>
+<p>详情请阅读<a target="_blank" href="https://www.pengtech.net/angular/angular_migrate_to_mdc.html">鹏叔的技术博客 MDC-based Angular Material 组件迁移</a></p>
+<p>如果项目非常大且复杂, Angular Material component 的迁移可以 module by module, 也可以 component by component.</p>
+<p>如果项目不是很大, 可以一次性迁移到 MDC-based Angular material</p>
+<pre class="language-bash"><code class="language-bash"><div><span class="token function">ng</span> generate @angular/material:mdc-migration</div></code></pre>
+<p>这条 migration 指令提供了交互式的选项，根据本身项目的特点进行选择。</p>
+
+        <h4 id="3-2-7--%E6%AD%A5%E9%AA%A4%E4%B8%89:-%E6%89%A7%E8%A1%8C%E6%B5%8B%E8%AF%95%E6%8C%87%E4%BB%A4" class="docs-header-link">
+          <span header-link="3-2-7--%E6%AD%A5%E9%AA%A4%E4%B8%89:-%E6%89%A7%E8%A1%8C%E6%B5%8B%E8%AF%95%E6%8C%87%E4%BB%A4"></span>
+          3.2.7. 步骤三: 执行测试指令
+        </h4>
+      <pre class="language-bash"><code class="language-bash"><div><span class="token function">ng</span> <span class="token function">test</span></div></code></pre>
+<p>在新的版本上对原代码进行编译和测试，有助于升级后的问题发现和解决。</p>
+
+        <h4 id="3-2-8--%E6%AD%A5%E9%AA%A4%E5%9B%9B%EF%BC%9A%E5%90%AF%E5%8A%A8%E7%A8%8B%E5%BA%8F,-%E6%89%8B%E5%8A%A8%E6%B5%8B%E8%AF%95" class="docs-header-link">
+          <span header-link="3-2-8--%E6%AD%A5%E9%AA%A4%E5%9B%9B%EF%BC%9A%E5%90%AF%E5%8A%A8%E7%A8%8B%E5%BA%8F,-%E6%89%8B%E5%8A%A8%E6%B5%8B%E8%AF%95"></span>
+          3.2.8. 步骤四：启动程序, 手动测试
+        </h4>
+      <p>现在可以启动程序了 npm run start 或者 ng serve, 并进行一些测试和检查.</p>
+<pre class="language-bash"><code class="language-bash"><div><span class="token function">npm</span> run start
+<span class="token comment" spellcheck="true"># 或者</span>
+<span class="token function">ng</span> serve --open</div></code></pre>
+
+        <h2 id="4--%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" class="docs-header-link">
+          <span header-link="4--%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5"></span>
+          4. 问题排查
+        </h2>
+      
+        <h3 id="4-1--issue-1" class="docs-header-link">
+          <span header-link="4-1--issue-1"></span>
+          4.1. Issue 1
+        </h3>
+      <p>升级到 Angular 15 后重新编译, 遇到如下警告</p>
+<pre class="language-bash"><code class="language-bash"><div>TypeScript compiler options <span class="token string">"target"</span> and <span class="token string">"useDefineForClassFields"</span> are <span class="token keyword">set</span> to <span class="token string">"ES2022"</span> and <span class="token string">"false"</span> respectively by the Angular CLI.</div></code></pre>
+<p>分析: 在 Angular 15, typescript 的编译目标是 ES2022, 然后在通过 Babel 再次将 ES2022 编译到.browserslistrc 中定义的最终目标</p>
+<p>所以如果 tsconfig.json 中的指定的 target 如果不是 ES2022, 编译器会给出警告.</p>
+<p>解决办法: 这里建议升级后将 ts 的 target 修改为 ES2022, 反正最终 js 目标是由.browserslistrc 中的配置决定的.</p>
+<p>详细分析请查看, <a target="_blank" href="https://stackoverflow.com/questions/75047760/typescript-target-warnings-after-angular-15-update">Typescript target warnings after Angular 15 update</a></p>
+
+        <h3 id="4-2--issue-2" class="docs-header-link">
+          <span header-link="4-2--issue-2"></span>
+          4.2. Issue 2
+        </h3>
+      <p>在运行 prod 编译的过程中, 遇到如下错误. 如下问题</p>
+<pre class="language-bash"><code class="language-bash"><div><span class="token function">ng</span> build --configuration<span class="token operator">=</span>production <span class="token operator">&amp;&amp;</span> <span class="token function">ng</span> run your-app:prerender:production</div></code></pre>
+<pre class="language-bash"><code class="language-bash"><div>
+Error: Optimization error <span class="token punctuation">[</span>325.3c5087ba2c9c5885.js<span class="token punctuation">]</span>: X <span class="token punctuation">[</span>ERROR<span class="token punctuation">]</span> Transforming const to the configured target environment <span class="token punctuation">(</span><span class="token string">"chrome114.0"</span>, <span class="token string">"edge114.0"</span>, <span class="token string">"firefox102.0"</span>, <span class="token string">"ios10.3"</span>, <span class="token string">"safari11.0"</span><span class="token punctuation">)</span> is not supported yet
+
+    325.3c5087ba2c9c5885.js:5737:6:
+      5737 │       const scale <span class="token operator">=</span> this._cachedMeta.rScale<span class="token punctuation">;</span>
+</div></code></pre>
+<p>Angular 15 已经不再支持一些较旧的浏览器版本了, 基本上只能运行 ES5 版本的浏览器都不再支持了.</p>
+<p>解决办法: 调整.browserslistrc 的配置, 如果 Angular 15 不支持的浏览器版本, 建议去除掉.</p>
+
+        <h2 id="5--%E7%9B%B8%E5%85%B3%E9%98%85%E8%AF%BB" class="docs-header-link">
+          <span header-link="5--%E7%9B%B8%E5%85%B3%E9%98%85%E8%AF%BB"></span>
+          5. 相关阅读
+        </h2>
+      <p>本文原文位于<a target="_blank" href="https://www.pengtech.net/angular/angular_upgrade_13_to_15.html">从 Angular 13 升级到 Angular 15</a>, 欢迎访问原文以获得最近更新.
+更多 Angular 相关文章请访问<a target="_blank" href="https://www.pengtech.net/angular/">Angular 合集 | 鹏叔的技术博客</a></p>
+
+        <h2 id="6--%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3" class="docs-header-link">
+          <span header-link="6--%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3"></span>
+          6. 参考文档
+        </h2>
+      <div class="dg-paragraph"><a target="_blank" href="https://blog.csdn.net/alvachien/article/details/127602168">Angular：升级 Angular 13 到 Angular 14</a></div>
+<div class="dg-paragraph"><a target="_blank" href="https://blog.csdn.net/alvachien/article/details/129108417">Angular: 升级 Angular 14 到 Angular 15</a></div>
+<div class="dg-paragraph"><a target="_blank" href="https://developapa.com/angular-material-legacy-styles/">Fix broken Angular material legacy styles</a></div>
+<div class="dg-paragraph"><a target="_blank" href="https://glitch.com/@material">glitch @material</a></div>
+<div class="dg-paragraph"><a target="_blank" href="https://codelabs.developers.google.com">Code labs</a></div>

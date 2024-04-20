@@ -1,0 +1,121 @@
+<p>Angular 16 于 2023 年 5 月 3 日发布.</p>
+<p>今天，我计划向您介绍如何升级到 Angular 16。</p>
+<!-- more -->
+
+
+        <h2 id="1--%E5%8D%87%E7%BA%A7%E5%89%8D%E5%87%86%E5%A4%87" class="docs-header-link">
+          <span header-link="1--%E5%8D%87%E7%BA%A7%E5%89%8D%E5%87%86%E5%A4%87"></span>
+          1. 升级前准备
+        </h2>
+      <p>升级前到 Angular 16 之前, 请确保当前 Angular 已经升级到 Angular 15, 并完成了 Angular 15 所有的迁移任务. 如果没有完成 Angular 13 到 14, 以及 14 到 15 的升级任务, 可以参考我的博客<a target="_blank" href="https://www.pengtech.net/angular/angular_upgrade_13_to_15.html">从 Angular 13 升级到 Angular 15</a></p>
+<p>升级前需要了解 Angular 16 与 Typescript, nodejs 等的版本兼容信息. 可以参考<a target="_blank" href="https://angular.io/guide/versions">Actively supported versions</a></p>
+<p>Actively supported versions</p>
+<table>
+<thead>
+<tr>
+<th align="left">ANGULAR</th>
+<th align="left">NODE.JS</th>
+<th align="left">TYPESCRIPT</th>
+<th align="left">RXJS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">16.1.x || 16.2.x</td>
+<td align="left">^16.14.0 || ^18.10.0</td>
+<td align="left">&gt;=4.9.3 &lt;5.2.0</td>
+<td align="left">^6.5.3 || ^7.4.0</td>
+</tr>
+<tr>
+<td align="left">16.0.x</td>
+<td align="left">^16.14.0 || ^18.10.0</td>
+<td align="left">&gt;=4.9.3 &lt;5.1.0</td>
+<td align="left">^6.5.3 || ^7.4.0</td>
+</tr>
+<tr>
+<td align="left">15.1.x || 15.2.x</td>
+<td align="left">^14.20.0 || ^16.13.0 || ^18.10.0</td>
+<td align="left">&gt;=4.8.2 &lt;5.0.0</td>
+<td align="left">^6.5.3 || ^7.4.0</td>
+</tr>
+<tr>
+<td align="left">15.0.x</td>
+<td align="left">^14.20.0 || ^16.13.0 || ^18.10.0</td>
+<td align="left">~4.8.2</td>
+<td align="left">^6.5.3 || ^7.4.0</td>
+</tr>
+<tr>
+<td align="left">14.2.x || 14.3.x</td>
+<td align="left">^14.15.0 || ^16.10.0</td>
+<td align="left">&gt;=4.6.2 &lt;4.9.0</td>
+<td align="left">^6.5.3 || ^7.4.0</td>
+</tr>
+<tr>
+<td align="left">14.0.x || 14.1.x</td>
+<td align="left">^14.15.0 || ^16.10.0</td>
+<td align="left">&gt;=4.6.2 &lt;4.8.0</td>
+<td align="left">^6.5.3 || ^7.4.0</td>
+</tr>
+</tbody></table>
+
+        <h3 id="1-1--%E5%8D%87%E7%BA%A7-nodejs" class="docs-header-link">
+          <span header-link="1-1--%E5%8D%87%E7%BA%A7-nodejs"></span>
+          1.1. 升级 Nodejs
+        </h3>
+      <p>可以参考我的博客<a target="_blank" href="https://www.pengtech.net/nodejs/install_and_config_nodejs.html">安装并配置 nodejs</a>, 进行安装升级和配置.</p>
+<p>对于 Angular 16 来说, 建议升级到 v16.14.2 或者 v18.10.0</p>
+
+        <h3 id="1-2--%E5%8D%87%E7%BA%A7-angular-%E4%BB%A5%E5%8F%8A-typescript" class="docs-header-link">
+          <span header-link="1-2--%E5%8D%87%E7%BA%A7-angular-%E4%BB%A5%E5%8F%8A-typescript"></span>
+          1.2. 升级 Angular 以及 Typescript
+        </h3>
+      <p>升级 Nodejs 后, 需要重新安装配置 angular cli, 此步骤可用参考我的博客<a target="_blank" href="https://www.pengtech.net/angular/angular2_installation.html">Angular CLI 安装和使用</a>, Angular 建议安装最新版本 16.2.10</p>
+<p>总结下来也就以下几步:</p>
+<pre class="language-bash"><code class="language-bash"><div>
+<span class="token comment" spellcheck="true"># 安装 typescript</span>
+<span class="token function">npm</span> i -g typescript@4.9.3
+<span class="token comment" spellcheck="true"># 安装 Angular CLI</span>
+<span class="token function">npm</span> <span class="token function">install</span> -g @angular/cli@16.2.10
+<span class="token comment" spellcheck="true"># 或者</span>
+cnpm <span class="token function">install</span> -g @angular/cli@16.2.10
+</div></code></pre>
+
+        <h2 id="2--%E5%8D%87%E7%BA%A7-angular-%E5%88%B0-v16" class="docs-header-link">
+          <span header-link="2--%E5%8D%87%E7%BA%A7-angular-%E5%88%B0-v16"></span>
+          2. 升级 Angular 到 v16
+        </h2>
+      <p>前面得准备工作完成后, 接下来就是重要得步骤, 升级 Angular 应用程序了.</p>
+<p>升级前建议您先到<a target="_blank" href="https://update.angular.io/?l=3&amp;v=15.0-16.0">https://update.angular.io/?l=3&amp;v=15.0-16.0</a> 阅读一下有哪些更新, 以及官方建议的步骤, 做到心中有数.</p>
+<p>另外建议备份程序, 切换到新的分支, 如果不成功, 可以立即回撤.</p>
+
+        <h3 id="2-1--%E5%8D%87%E7%BA%A7-angular-cli,-core-%E5%92%8C-cdk" class="docs-header-link">
+          <span header-link="2-1--%E5%8D%87%E7%BA%A7-angular-cli,-core-%E5%92%8C-cdk"></span>
+          2.1. 升级 angular cli, core 和 cdk
+        </h3>
+      <p>首先运行以下命令, 通常情况下不会成功, 但是会列出一些依赖关系问题, 确定一下依赖关系不存在严重问题, 可以使用--force 选项继续更新.</p>
+<pre class="language-bash"><code class="language-bash"><div>
+<span class="token function">ng</span> update @angular/core@16.2.10 @angular/cdk@16.2.10 @angular/cli@16.2.10
+</div></code></pre>
+<p>然后先升级 angular cli, core</p>
+<pre class="language-bash"><code class="language-bash"><div>
+<span class="token function">ng</span> update @angular/core@16.2.10  @angular/cli@16.2.10 --force
+</div></code></pre>
+<p>再升级 CDK</p>
+<pre class="language-bash"><code class="language-bash"><div>
+<span class="token function">ng</span> update @angular/cdk@16.2.10
+</div></code></pre>
+<p>如果项目中使用了 angular material, 需要将其升级到对应的版本</p>
+<pre class="language-bash"><code class="language-bash"><div>
+<span class="token function">ng</span> update  @angular/material@16.2.10
+</div></code></pre>
+
+        <h2 id="3--angular-%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0" class="docs-header-link">
+          <span header-link="3--angular-%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0"></span>
+          3. Angular 系列文章
+        </h2>
+      <p>最新更新以及更多 Angular 相关文章请访问 <a target="_blank" href="https://www.pengtech.net/angular/">Angular 合集 | 鹏叔的技术博客</a></p>
+
+        <h2 id="4--%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3" class="docs-header-link">
+          <span header-link="4--%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3"></span>
+          4. 参考文档
+        </h2>
+      <div class="dg-paragraph"><a target="_blank" href="https://medium.com/@ahmad.g.mustafa/upgrade-to-angular-16-step-by-step-e23d2963a2a8">Upgrade to Angular 16 step by step</a></div>

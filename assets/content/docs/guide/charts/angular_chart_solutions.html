@@ -1,0 +1,280 @@
+
+        <h2 id="1--%E5%89%8D%E8%A8%80" class="docs-header-link">
+          <span header-link="1--%E5%89%8D%E8%A8%80"></span>
+          1. 前言
+        </h2>
+      <p>如今，数据分析是任何业务应用程序的重要组成部分。这有助于企业做出重要决策。以易于理解和交互的方式表示大量数据非常重要。
+图表对于美观、易于理解和交互式的数据可视化非常有用。</p>
+<p>JavaScript 中有不同的开源和付费图表库，可以实现漂亮的数据表示。</p>
+<p>在本文中，我们将研究几款美观的, 易于交互的 Angular 图表库。</p>
+<p>首先，我们将看到开源 Angular 图表库，稍后我们将研究其他付费 Angular 图表库.</p>
+<!-- more -->
+
+
+        <h2 id="2--npm-%E8%B6%8B%E5%8A%BF%E5%9B%BE" class="docs-header-link">
+          <span header-link="2--npm-%E8%B6%8B%E5%8A%BF%E5%9B%BE"></span>
+          2. npm 趋势图
+        </h2>
+      <p>以下是近五年(as of 2023-09-04)的 npm 趋势图</p>
+<div class="dg-paragraph"><img src="https://www.pengtech.net/images/P3lVCSR.jpg" alt="Angular chart lib trends"></div>
+<p>以及状态图</p>
+<div class="dg-paragraph"><img src="https://www.pengtech.net/images/ioIgaDm.jpg" alt="Angular chart lib status"></div>
+<p>从图中我们可以看出, ng2-charts 是比较老牌的 angular 图表库, 而且一直保持着较好的增长. 后起之秀 highcharts-angular 发展也比较迅猛.</p>
+<p>ngx-echarts 一直保持着稳步增长. 从活跃度来看 ng2-charts 更新一直比较活跃.</p>
+<blockquote>
+<p>注意以上图中, 没有将 PrimeNG/Charts 加入到比较, 因为 PrimeNG/Charts 是 PrimeNG 这个大包里面的一个模块, npmtrends 不支持将模块添加到比较行列.
+而将整个 PrimeNG 添加到比较行列对其它 charts 库又不太公平, 所以请自行判断 PrimeNG/Charts 在整个 Angular chart libs 中的地位和发展.</p>
+</blockquote>
+
+        <h2 id="3--%E6%9C%80%E4%BD%B3%E5%BC%80%E6%BA%90-angular-%E5%9B%BE%E8%A1%A8%E5%BA%93" class="docs-header-link">
+          <span header-link="3--%E6%9C%80%E4%BD%B3%E5%BC%80%E6%BA%90-angular-%E5%9B%BE%E8%A1%A8%E5%BA%93"></span>
+          3. 最佳开源 Angular 图表库
+        </h2>
+      <p>以下是使用 Angular 技术封装的最佳开源图表库</p>
+<ul>
+<li>ng2-charts</li>
+<li>ngx-echarts</li>
+<li>PrimeNG Charts</li>
+<li>ngx-charts</li>
+<li>angular-plotly.js</li>
+</ul>
+
+        <h2 id="4--ng2-charts" class="docs-header-link">
+          <span header-link="4--ng2-charts"></span>
+          4. ng2-charts
+        </h2>
+      <div class="dg-paragraph"><a target="_blank" href="https://valor-software.com/ng2-charts/#/GeneralInfo">ng2-charts</a>是经过 Angular 包装的基于<a target="_blank" href="https://www.chartjs.org/">Chart.js</a>的 Angular 指令(directive)</div>
+<p>Chart.js 是一个流行的开源 JavaScript 图表库, Chart.js 使用 HTML5 画布，可在所有现代浏览器（IE11+）上提供出色的渲染性能。</p>
+<p>ng2-charts 它提供了便于集成到 Angular 应用程序中的原理图。</p>
+
+        <h3 id="4-1--ng2-charts-%E5%8A%9F%E8%83%BD" class="docs-header-link">
+          <span header-link="4-1--ng2-charts-%E5%8A%9F%E8%83%BD"></span>
+          4.1. Ng2-Charts 功能
+        </h3>
+      <p>图表类型:</p>
+<p>ng2-charts 支持 8 种图表类型：</p>
+<ul>
+<li>折线图</li>
+<li>条形图</li>
+<li>雷达图</li>
+<li>饼图</li>
+<li>面积图</li>
+<li>圆环图</li>
+<li>气泡图</li>
+<li>散点图</li>
+</ul>
+<p>定制化:</p>
+<ul>
+<li>图例(Legends)</li>
+<li>标签</li>
+<li>颜色</li>
+<li>提示条(Tooltip)</li>
+<li>主题(Theming)</li>
+<li>组合图表(Combine Charts)</li>
+<li>选项(Options)</li>
+</ul>
+<p>在这里查看<a target="_blank" href="https://www.ngdevelop.tech/angular-ng2-charts-develop-awesome-charts-in-angular-13/">Angular 13 中带有 ng2-charts 的很棒的图表</a></p>
+
+        <h2 id="5--ngx-charts" class="docs-header-link">
+          <span header-link="5--ngx-charts"></span>
+          5. ngx-charts
+        </h2>
+      <div class="dg-paragraph"><a target="_blank" href="https://swimlane.github.io/ngx-charts/#/ngx-charts/">ngx-charts</a>是 Angular2+ 的声明式图表框架。</div>
+<p>它使用 Angular 来渲染和动画 SVG 元素，并利用 Angular 所有的绑定和速度优势，并使用 d3 来实现出色的数学函数、比例、轴和形状生成器等。</p>
+<p>通过让 Angular 完成所有渲染，它为我们带来了 Angular 平台提供的无限可能性，例如 AoT、Universal 等。</p>
+<p>ngx-charts 允许我们使用 CSS 自定义样式。我们还可以使用 ngx-charts 组件创建自定义图表。</p>
+<p>以下是一篇很好的关于如何在 Angular 项目中使用 Ngx-Charts 的文章<a target="_blank" href="https://www.ngdevelop.tech/how-to-use-ngx-charts-in-angular/">How To Use Ngx-Charts In Angular Application ?</a></p>
+
+        <h3 id="5-1--ngx-charts-%E5%8A%9F%E8%83%BD" class="docs-header-link">
+          <span header-link="5-1--ngx-charts-%E5%8A%9F%E8%83%BD"></span>
+          5.1. ngx-charts 功能
+        </h3>
+      <ul>
+<li><p>图表类型</p>
+<ul>
+<li>水平和垂直条形图(bar charts)</li>
+<li>线型图(line)</li>
+<li>面积图(Area)（标准、堆叠、归一化）</li>
+<li>饼图(Pie)（可爆炸、网格、自定义图例）</li>
+<li>气泡图(bubble)</li>
+<li>油炸圈饼(Doughnut)</li>
+<li>仪表盘(Gauge)（线性和径向）</li>
+<li>热图(Heatmap)</li>
+<li>树形图(Treemap)</li>
+<li>数字卡片图(Number Cards)</li>
+</ul>
+</li>
+<li><p>定制化</p>
+<ul>
+<li>自动缩放</li>
+<li>时间线过滤(Timeline Filtering)</li>
+<li>Line Interpolation</li>
+<li>可配置的轴标签</li>
+<li>图例(Legends)（标签和渐变）</li>
+<li>可定制的标签位置</li>
+<li>实时数据支持</li>
+<li>可定制的工具提示</li>
+<li>数据点事件处理程序(Data point Event Handlers)</li>
+<li>应用主题(Theming)</li>
+<li>可以配合 ngUpgrade 一起升级</li>
+</ul>
+</li>
+</ul>
+
+        <h2 id="6--ngx-echarts" class="docs-header-link">
+          <span header-link="6--ngx-echarts"></span>
+          6. Ngx-Echarts
+        </h2>
+      <div class="dg-paragraph"><a target="_blank" href="https://xieziyu.github.io/ngx-echarts/#/home">ngx-echarts</a>是经过 Angular 包装的基于<a target="_blank" href="https://echarts.apache.org/examples/en/">ECharts</a> (3.x+) 的 Angular 指令(directive)</div>
+<p>ECharts 是一个开源的、基于 Web 的、跨平台的框架，支持交互式可视化的快速构建。</p>
+<p>ECharts 在 github 上拥有 39.6k star 和 13.2k fork，被视为全球领先的可视化开发工具，在 GitHub 可视化类别中排名第三。</p>
+<p>它可以在 PC 和移动设备上流畅运行。它与大多数现代网络浏览器兼容，例如 IE8/9/10/11、Chrome、Firefox、Safari 等。ECharts 依赖图形渲染引擎 ZRender 来创建直观、交互式和高度可定制的图表。</p>
+
+        <h3 id="6-1--ngx-echarts-%E5%8A%9F%E8%83%BD" class="docs-header-link">
+          <span header-link="6-1--ngx-echarts-%E5%8A%9F%E8%83%BD"></span>
+          6.1. Ngx-Echarts 功能
+        </h3>
+      <ul>
+<li><p>图表类型</p>
+<ul>
+<li>线型图系列</li>
+<li>条形图系列</li>
+<li>散点图系列</li>
+<li>饼图</li>
+<li>烛台图系列</li>
+<li>统计箱线图系列</li>
+<li>Map 系列</li>
+<li>热图系列</li>
+<li>方向信息线系列</li>
+<li>关系图系列</li>
+<li>树状图系列</li>
+<li>旭日图系列</li>
+<li>多平行系列尺寸数据</li>
+<li>漏斗系列</li>
+<li>量具系列</li>
+</ul>
+</li>
+<li><p>定制化</p>
+<ul>
+<li>加载处理(Loading Handling)</li>
+<li>事件处理(Event Handling)</li>
+<li>数据实时更新</li>
+<li>初始选项(Initial Options)</li>
+<li>自动调整大小(Auto Resize)</li>
+<li>应用主题</li>
+<li>图表连接(Connect Charts)</li>
+<li>可拖拽图表</li>
+<li>3D 图表</li>
+</ul>
+</li>
+</ul>
+<p>请参阅<a target="_blank" href="https://echarts.apache.org/en/option.html#title">ECharts 文档</a>以获取更多自定义信息。</p>
+<p>在此处查看<a target="_blank" href="https://www.ngdevelop.tech/data-visualization-with-echarts-in-angular-using-ngx-echarts/">使用 NGX-ECHARTS 在 Angular 中使用 ECharts 进行数据可视化</a> （带有 COVID Tracker 示例应用程序）。</p>
+
+        <h2 id="7--angular-plotly" class="docs-header-link">
+          <span header-link="7--angular-plotly"></span>
+          7. Angular-Plotly
+        </h2>
+      <div class="dg-paragraph"><a href="">Angular-plotly</a>是来自 plotly 的 plotly.js Angular 组件。</div>
+<p>它支持 Angular 9.x，如果您想与 Angular 8.x 一起使用，请使用版本<code>angular-plotly.js@1.x</code></p>
+<p>plotly.js 构建于 d3.js 和 stack.gl 之上，是一个高级声明性图表库。plotly.js 附带 40 多种图表类型，包括科学图表、3D 图表、统计图表、SVG 地图、金融图表等。Plotly.js 在 github 上有 1.12 万颗星和 1.3 万个分支。</p>
+
+        <h3 id="7-1--angular-plotly-js-%E7%9A%84%E5%8A%9F%E8%83%BD" class="docs-header-link">
+          <span header-link="7-1--angular-plotly-js-%E7%9A%84%E5%8A%9F%E8%83%BD"></span>
+          7.1. Angular-Plotly.Js 的功能
+        </h3>
+      <ul>
+<li><p>基本图表：
+散点图、条形图、折线图、饼图、气泡图、点图、填充面积图、水平条形图、旭日图、桑基图、点云、多图表类型</p>
+</li>
+<li><p>统计图表：
+误差线、箱线图、直方图、二维密度图、平行类别图。</p>
+</li>
+<li><p>金融图表：
+瀑布图、指标、烛台图、漏斗图和漏斗面积图。</p>
+</li>
+<li><p>地图：
+Mapbox 地图图层、Mapbox 密度热图、Choropleth Mapbox、地图上的线条等。</p>
+</li>
+<li><p>3D 图表：
+3D 散点图、带状图、3D 曲面图、3D 网格图等</p>
+</li>
+</ul>
+<p>定制化:</p>
+<ul>
+<li>下载为 SVG / PNG</li>
+<li>数据导出</li>
+<li>事件处理</li>
+<li>自动调整大小(Auto Resize)</li>
+<li>滚动(Scroll)</li>
+<li>缩放(Zoom)</li>
+<li>筛选(Filter)</li>
+<li>动效(Animation)</li>
+<li>分组(Group by)</li>
+</ul>
+
+        <h2 id="8--primeng/chart" class="docs-header-link">
+          <span header-link="8--primeng/chart"></span>
+          8. primeng/chart
+        </h2>
+      <div class="dg-paragraph"><a target="_blank" href="https://primefaces.org/primeng/#/chart/bar">PrimeNg/Charts</a>组件基于 Charts.js 2.7.x，这是一个基于开源 HTML5 的图表库。</div>
+<p>PrimeNG 是 Angular 的丰富 UI 组件的集合。所有小部件都是开源的，可以在 MIT 许可下免费使用。</p>
+
+        <h3 id="8-1--primeng/charts-%E5%8A%9F%E8%83%BD" class="docs-header-link">
+          <span header-link="8-1--primeng/charts-%E5%8A%9F%E8%83%BD"></span>
+          8.1. PrimeNG/Charts 功能
+        </h3>
+      <p>图表类型:</p>
+<p>目前有 6 个选项可供选择；饼图、圆环图、折线图（折线图或水平条形图）、条形图、雷达图和极面积图。</p>
+<p>定制化:</p>
+<ul>
+<li>响应式(Responsive)</li>
+<li>事件处理</li>
+<li>标签</li>
+<li>图例(Legends)</li>
+<li>提示条(Tooltip)</li>
+<li>宽度和高度</li>
+<li>选项（参考 <a target="_blank" href="https://www.chartjs.org/docs/latest/">Chart.js 文档</a>）</li>
+</ul>
+
+        <h2 id="9--angular-google-charts" class="docs-header-link">
+          <span header-link="9--angular-google-charts"></span>
+          9. Angular Google Charts
+        </h2>
+      <p>angular-google-charts 是为 Angular 6 和 7 编写的 Google Charts 库的包装器(wrapper)。</p>
+<p>Google 图表工具功能强大、易于使用且免费。</p>
+<p>注意：Google Charts 是免费的，但不是开源的。Google 的许可不允许您在您的服务器上托管他们的 JS 文件。因此，如果您是企业并拥有一些敏感数据，Google Charts 可能不是最佳选择。</p>
+
+        <h2 id="10--highcharts-angular" class="docs-header-link">
+          <span header-link="10--highcharts-angular"></span>
+          10. Highcharts Angular
+        </h2>
+      <p>Highcharts Angular 是 Angular 的官方 Highcharts 包装器(wrapper)。</p>
+<p>Highcharts 是一个基于 SVG 的现代多平台图表库。它拥有丰富的图表集合。</p>
+<p>Highcharts 对于非商业用途是免费的，对于商业用途是付费的。</p>
+
+        <h2 id="11--angular-fusion-charts" class="docs-header-link">
+          <span header-link="11--angular-fusion-charts"></span>
+          11. Angular Fusion Charts
+        </h2>
+      <p>angular-fusioncharts 是 FusionCharts JavaScript 图表库的简单且轻量级的官方 Angular 组件。angular-fusioncharts 使您能够轻松地在 Angular 应用程序中添加 JavaScript 图表。</p>
+<p>FusionCharts 是一个 JavaScript 图表库，拥有饼图、柱形图、面积图、折线图、雷达图等图表以及 150 多种其他用于 Web 应用程序的图表。</p>
+<p>Fusion Charts 提供商业用途的付费许可。</p>
+
+        <h2 id="12--%E7%9B%B8%E5%85%B3%E6%96%87%E7%AB%A0" class="docs-header-link">
+          <span header-link="12--%E7%9B%B8%E5%85%B3%E6%96%87%E7%AB%A0"></span>
+          12. 相关文章
+        </h2>
+      <p>最新更新以及更多 Angular 相关文章请访问 <a target="_blank" href="https://www.pengtech.net/angular/">Angular 合集 | 鹏叔的技术博客</a></p>
+
+        <h2 id="13--%E6%80%BB%E7%BB%93" class="docs-header-link">
+          <span header-link="13--%E6%80%BB%E7%BB%93"></span>
+          13. 总结
+        </h2>
+      <p>在本文中，我们看到了五个最好的开源 Angular 图表库和其他付费 Angular 图表库。本文原文位于<a target="_blank" href="https://www.pengtech.net/angular/angular_chart_solutions.html">Angular 图表库介绍 | 鹏叔的技术博客</a>, 若要获取最近更新请访问原文.</p>
+
+        <h2 id="14--%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3" class="docs-header-link">
+          <span header-link="14--%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3"></span>
+          14. 参考文档
+        </h2>
+      <div class="dg-paragraph"><a target="_blank" href="https://www.ngdevelop.tech/best-angular-chart-libraries">Best Angular Chart Libraries</a></div>
